@@ -28,7 +28,7 @@
 	[Event(name="validated", type="com.lorentz.SVG.events.SVGEvent")]
 	
 	public class SVGElement extends Sprite implements ICloneable {
-		protected var content:Sprite;
+		public var content:Sprite;
 
 		private var _mask:DisplayObject;
 		private static const _maskRgbToLuminanceFilter:ColorMatrixFilter = new ColorMatrixFilter([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2125, 0.7154, 0.0721, 0, 0,]);
@@ -46,15 +46,18 @@
 		private var _finalStyle:StyleDeclaration;
 		
 		private var _parentElement:SVGElement;
+		private var _lastParentElement:SVGElement;
 		private var _viewPortElement:ISVGViewPort;
 		private var _document:SVGDocument;
 		private var _numInvalidElements:int = 0;
 		private var _numRunningAsyncValidations:int = 0;
 		private var _runningAsyncValidations:Object = {};
 		private var _invalidFlag:Boolean = false;
+		private var _invalidSizeFlag:Boolean = false;
 		private var _invalidStyleFlag:Boolean = false;
 		private var _invalidPropertiesFlag:Boolean = false;
 		private var _invalidTransformFlag:Boolean = false;
+		private var _invalidPointerEventsFlag:Boolean = false;
 		private var _displayChanged:Boolean = false;
 		private var _opacityChanged:Boolean = false;
 		private var _attributes:Object = {};
@@ -77,6 +80,11 @@
 			
 			content = new Sprite();
 			addChild(content);
+		}
+		
+		public function move(newX:Number, newY:Number):void{
+			x = newX;
+			y = newY;
 		}
 		
 		public function get type():String {
@@ -142,6 +150,14 @@
 		
 		protected function onAttributeChanged(attributeName:String, oldValue:Object, newValue:Object):void {
 			switch(attributeName){
+				case "width" :
+					_invalidSizeFlag = true;
+					invalidateProperties();
+					break;
+				case "height" :
+					_invalidSizeFlag = true;
+					invalidateProperties();
+					break;
 				case "class" :
 					invalidateStyle(true);
 					break;
@@ -155,6 +171,10 @@
 					break;
 				case "transform" :
 					_invalidTransformFlag = true;
+					invalidateProperties();
+					break;
+				case "pointer-events" :
+					_invalidPointerEventsFlag = true;
 					invalidateProperties();
 					break;
 			}
@@ -202,6 +222,10 @@
 			return _parentElement;
 		}
 		
+		public function get lastParentElement():SVGElement {
+			return _lastParentElement;
+		}
+		
 		protected function setParentElement(value:SVGElement):void {
 			if(_parentElement != value){
 				if(_parentElement != null) {
@@ -209,6 +233,7 @@
 					_parentElement.numRunningAsyncValidations -= _numRunningAsyncValidations;
 				}
 				
+				_lastParentElement = _parentElement;
 				_parentElement = value;
 				
 				if(_parentElement != null) {
@@ -348,7 +373,7 @@
 		public function validate():void {
 			if(_invalidStyleFlag)
 				updateStyles();
-			
+									
 			updateCurrentFontSize();
 			
 			if(_invalidPropertiesFlag)
@@ -375,8 +400,11 @@
 		
 		public function endASyncValidation(validationId:String):void {
 			if(_runningAsyncValidations[validationId] != null){
-				numRunningAsyncValidations--;
 				delete _runningAsyncValidations[validationId];
+				numRunningAsyncValidations--;
+			}
+			else{
+				trace("found not paired validation: " + validationId);
 			}
 		}
 		
@@ -462,7 +490,7 @@
 			
 			mat.scale(scaleX, scaleY);
 			mat.rotate(MathUtils.radiusToDegress(rotation));
-			mat.translate(x, y);
+			//mat.translate(x, y);
 			
 			if(shouldApplySvgTransform && svgTransform != null){
 				var svgTransformMat:Matrix = SVGParserCommon.parseTransformation(svgTransform);
@@ -494,9 +522,36 @@
 		protected function commitProperties():void {
 			_invalidPropertiesFlag = false;
 			
+			if(_invalidSizeFlag){
+				_invalidSizeFlag = false;
+			}
+			
 			if(_invalidTransformFlag){
 				_invalidTransformFlag = false;
 				transform.matrix = computeTransformMatrix();
+			}
+			
+			if(_invalidTransformFlag){
+				_invalidTransformFlag = false;
+				transform.matrix = computeTransformMatrix();
+			}
+			
+			if(_invalidTransformFlag){
+				_invalidTransformFlag = false;
+				transform.matrix = computeTransformMatrix();
+			}
+			
+			if(_invalidPointerEventsFlag){
+				_invalidTransformFlag = false;
+				var pointerEvents:String = finalStyle.getPropertyValue("pointer-events");
+				if(pointerEvents == "none"){
+					mouseChildren = false;
+					mouseEnabled = false;
+				}
+				else{
+					mouseChildren = true;
+					mouseEnabled = true;
+				}
 			}
 			
 			if (_svgClipPathChanged || _svgMaskChanged)
@@ -660,7 +715,6 @@
 				viewPortWidth = viewPortElement.viewPortWidth;
 				viewPortHeight = viewPortElement.viewPortHeight;
 			}
-			
 			return SVGUtil.getUserUnit(s, _currentFontSize, viewPortWidth, viewPortHeight, reference);
 		}
 		
@@ -675,7 +729,7 @@
 			_style.cloneOn(copy.style);
 			
 			copy.id = "????  Clone of \"" + id + "\"";
-			
+				
 			copy.svgTransform = svgTransform;
 			
 			if(this is ISVGViewBox)

@@ -29,6 +29,13 @@ package com.lorentz.SVG.parser
 	import com.lorentz.SVG.display.SVGTSpan;
 	import com.lorentz.SVG.display.SVGText;
 	import com.lorentz.SVG.display.SVGUse;
+	import com.lorentz.SVG.display.SVGAnimate;
+	import com.lorentz.SVG.display.SVGAnimateMotion;
+	import com.lorentz.SVG.display.SVGAnimateTransform;
+	import com.lorentz.SVG.display.foreign.SVGForeignObject;
+	import com.lorentz.SVG.display.foreign.SVGForeignP;
+	import com.lorentz.SVG.display.foreign.SVGForeignTextArea;
+	import com.lorentz.SVG.display.foreign.SVGForeignAudio;
 	import com.lorentz.SVG.display.base.ISVGPreserveAspectRatio;
 	import com.lorentz.SVG.display.base.ISVGViewBox;
 	import com.lorentz.SVG.display.base.SVGContainer;
@@ -125,6 +132,13 @@ package com.lorentz.SVG.parser
 					case 'use' : obj = visitUse(elt); break;
 					case 'pattern' : obj = visitPattern(elt); break;
 					case 'switch' : obj = visitSwitch(elt); break;
+					case 'animate' : obj = visitAnimate(elt); break;
+					case 'animatemotion' : obj = visitAnimateMotion(elt); break;
+					case 'animatetransform' : obj = visitAnimateTransform(elt); break;
+					case 'foreignobject' : obj = visitForeignObject(elt); break;
+					case 'p' : obj = visitForeignP(elt, childVisits); break;
+					case 'textarea' : obj = visitForeignTextArea(elt, childVisits); break;
+					case 'audio' : obj = visitForeignAudio(elt); break;
 				}
 			}
 			
@@ -213,7 +227,7 @@ package com.lorentz.SVG.parser
 		
 		private function visitPath(elt:XML):SVGPath {
 			var obj:SVGPath = new SVGPath();
-			obj.path = SVGParserCommon.parsePathData(elt.@d);
+			obj.svgPath = elt.@d;
 			return obj;
 		}
 		
@@ -408,6 +422,122 @@ package com.lorentz.SVG.parser
 		
 		private function visitSwitch(elt:XML):SVGSwitch {
 			var obj:SVGSwitch = new SVGSwitch();
+			return obj;
+		}
+		
+		private function visitAnimate(elt:XML):SVGAnimate {
+			var obj:SVGAnimate = new SVGAnimate();
+			obj.svgAttributeName = elt.@attributeName;
+			obj.svgBegin = elt.@begin;
+			obj.svgTo = elt.@to;
+			obj.svgDur = elt.@dur;
+			obj.svgRepeatCount = elt.@repeatCount;
+			return obj;
+		}
+		
+		private function visitAnimateMotion(elt:XML):SVGAnimateMotion {
+			var obj:SVGAnimateMotion = new SVGAnimateMotion();
+			obj.svgAttributeName = elt.@attributeName;
+			obj.svgDur = elt.@dur;
+			obj.svgPath = elt.@path;
+			obj.svgRepeatCount = elt.@repeatCount;
+			return obj;
+		}
+		
+		private function visitAnimateTransform(elt:XML):SVGAnimateTransform {
+			var obj:SVGAnimateTransform = new SVGAnimateTransform();
+			obj.svgType = elt.@type;
+			obj.svgBegin = elt.@begin;
+			obj.svgDur = elt.@dur;
+			obj.svgFrom = elt.@from;
+			obj.svgTo = elt.@to;
+			obj.svgRepeatCount = elt.@repeatCount;
+			return obj;
+		}
+		
+		private function visitForeignObject(elt:XML):SVGForeignObject {
+			var obj:SVGForeignObject = new SVGForeignObject();
+			
+			obj.svgWidth = ("@width" in elt) ? elt.@width : "0";
+			obj.svgHeight = ("@height" in elt) ? elt.@height : "0";
+			
+			return obj;
+		}
+		
+		private function visitForeignP(elt:XML, childVisits:Array):SVGForeignP {
+			var obj:SVGForeignP = new SVGForeignP();
+			
+			obj.svgX = ("@x" in elt) ? elt.@x : "0";
+			obj.svgY = ("@y" in elt) ? elt.@y : "0";
+			
+			var numChildrenToVisit:int = 0;
+			var visitNumber:int = 0;
+			for each(var childElt:XML in elt.*) {
+				numChildrenToVisit++;
+				childVisits.push(new VisitDefinition(childElt, function(child:Object):void{
+					if(child){
+						if(child is String){
+							var str:String = child as String;
+							str = SVGUtil.prepareXMLText(str);
+							
+							if(visitNumber == 0)
+								str = StringUtil.ltrim(str);
+							else if(visitNumber == numChildrenToVisit - 1)
+								str = StringUtil.rtrim(str);
+							
+							if(StringUtil.trim(str) != "") {
+								obj.addTextElement(str);
+							}
+						} else {
+							obj.addTextElement(child);
+						}
+					}
+					visitNumber++;
+				}));
+			}
+			return obj;
+		}
+		
+		private function visitForeignTextArea(elt:XML, childVisits:Array):SVGForeignTextArea {
+			var obj:SVGForeignTextArea = new SVGForeignTextArea();
+			
+			obj.svgX = ("@x" in elt) ? elt.@x : "0";
+			obj.svgY = ("@y" in elt) ? elt.@y : "0";
+			
+			var numChildrenToVisit:int = 0;
+			var visitNumber:int = 0;
+			for each(var childElt:XML in elt.*) {
+				numChildrenToVisit++;
+				childVisits.push(new VisitDefinition(childElt, function(child:Object):void{
+					if(child){
+						if(child is String){
+							var str:String = child as String;
+							str = SVGUtil.prepareXMLText(str);
+							
+							if(visitNumber == 0)
+								str = StringUtil.ltrim(str);
+							else if(visitNumber == numChildrenToVisit - 1)
+								str = StringUtil.rtrim(str);
+							
+							if(StringUtil.trim(str) != "") {
+								obj.addTextElement(str);
+							}
+						} else {
+							obj.addTextElement(child);
+						}
+					}
+					visitNumber++;
+				}));
+			}
+			return obj;
+		}
+		
+		private function visitForeignAudio(elt:XML):SVGForeignAudio {
+			var obj:SVGForeignAudio = new SVGForeignAudio();
+			
+			obj.src = ("@src" in elt) ? elt.@src : "";
+			obj.volume = ("@data-volume" in elt) ? elt.@volume : "0";
+			
 			return obj;
 		}
 		

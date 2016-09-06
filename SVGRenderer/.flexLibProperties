@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="false" useMultiPlatformConfig="false" version="3">
   <includeClasses>
+    <classEntry path="com.lorentz.SVG.data.AssetManager"/>
+    <classEntry path="com.lorentz.SVG.data.MarkerPlace"/>
+    <classEntry path="com.lorentz.SVG.data.MarkerType"/>
+    <classEntry path="com.lorentz.SVG.data.filters.ISVGFilter"/>
+    <classEntry path="com.lorentz.SVG.data.filters.SVGFilterCollection"/>
+    <classEntry path="com.lorentz.SVG.data.filters.SVGGaussianBlur"/>
     <classEntry path="com.lorentz.SVG.data.gradients.SVGGradient"/>
     <classEntry path="com.lorentz.SVG.data.gradients.SVGLinearGradient"/>
     <classEntry path="com.lorentz.SVG.data.gradients.SVGRadialGradient"/>
@@ -16,8 +22,13 @@
     <classEntry path="com.lorentz.SVG.data.path.SVGMoveToCommand"/>
     <classEntry path="com.lorentz.SVG.data.path.SVGPathCommand"/>
     <classEntry path="com.lorentz.SVG.data.style.StyleDeclaration"/>
+    <classEntry path="com.lorentz.SVG.data.text.SVGDrawnText"/>
+    <classEntry path="com.lorentz.SVG.data.text.SVGTextToDraw"/>
     <classEntry path="com.lorentz.SVG.display.SVG"/>
     <classEntry path="com.lorentz.SVG.display.SVGA"/>
+    <classEntry path="com.lorentz.SVG.display.SVGAnimate"/>
+    <classEntry path="com.lorentz.SVG.display.SVGAnimateMotion"/>
+    <classEntry path="com.lorentz.SVG.display.SVGAnimateTransform"/>
     <classEntry path="com.lorentz.SVG.display.SVGCircle"/>
     <classEntry path="com.lorentz.SVG.display.SVGClipPath"/>
     <classEntry path="com.lorentz.SVG.display.SVGDocument"/>
@@ -25,6 +36,7 @@
     <classEntry path="com.lorentz.SVG.display.SVGG"/>
     <classEntry path="com.lorentz.SVG.display.SVGImage"/>
     <classEntry path="com.lorentz.SVG.display.SVGLine"/>
+    <classEntry path="com.lorentz.SVG.display.SVGMarker"/>
     <classEntry path="com.lorentz.SVG.display.SVGMask"/>
     <classEntry path="com.lorentz.SVG.display.SVGPath"/>
     <classEntry path="com.lorentz.SVG.display.SVGPattern"/>
@@ -40,13 +52,22 @@
     <classEntry path="com.lorentz.SVG.display.base.ISVGViewBox"/>
     <classEntry path="com.lorentz.SVG.display.base.ISVGViewPort"/>
     <classEntry path="com.lorentz.SVG.display.base.SVGContainer"/>
+    <classEntry path="com.lorentz.SVG.display.base.SVGElement"/>
     <classEntry path="com.lorentz.SVG.display.base.SVGGraphicsElement"/>
+    <classEntry path="com.lorentz.SVG.display.base.SVGPContainer"/>
     <classEntry path="com.lorentz.SVG.display.base.SVGShape"/>
+    <classEntry path="com.lorentz.SVG.display.base.SVGSpanContainer"/>
     <classEntry path="com.lorentz.SVG.display.base.SVGTextContainer"/>
+    <classEntry path="com.lorentz.SVG.display.foreign.SVGForeignAudio"/>
+    <classEntry path="com.lorentz.SVG.display.foreign.SVGForeignObject"/>
+    <classEntry path="com.lorentz.SVG.display.foreign.SVGForeignP"/>
+    <classEntry path="com.lorentz.SVG.display.foreign.SVGForeignSpan"/>
+    <classEntry path="com.lorentz.SVG.display.foreign.SVGForeignTextArea"/>
     <classEntry path="com.lorentz.SVG.drawing.DashedDrawer"/>
     <classEntry path="com.lorentz.SVG.drawing.GraphicsDrawer"/>
     <classEntry path="com.lorentz.SVG.drawing.GraphicsPathDrawer"/>
     <classEntry path="com.lorentz.SVG.drawing.IDrawer"/>
+    <classEntry path="com.lorentz.SVG.drawing.MarkersPlacesCapturerDrawer"/>
     <classEntry path="com.lorentz.SVG.drawing.SVGPathRenderer"/>
     <classEntry path="com.lorentz.SVG.events.SVGEvent"/>
     <classEntry path="com.lorentz.SVG.events.StyleDeclarationEvent"/>
@@ -55,12 +76,13 @@
     <classEntry path="com.lorentz.SVG.parser.VisitDefinition"/>
     <classEntry path="com.lorentz.SVG.text.FTESVGTextDrawer"/>
     <classEntry path="com.lorentz.SVG.text.ISVGTextDrawer"/>
-    <classEntry path="com.lorentz.SVG.data.text.SVGTextToDraw"/>
     <classEntry path="com.lorentz.SVG.text.TextFieldSVGTextDrawer"/>
     <classEntry path="com.lorentz.SVG.utils.ArcUtils"/>
     <classEntry path="com.lorentz.SVG.utils.Base64AsyncDecoder"/>
     <classEntry path="com.lorentz.SVG.utils.Bezier"/>
     <classEntry path="com.lorentz.SVG.utils.DisplayUtils"/>
+    <classEntry path="com.lorentz.SVG.utils.FlashPlayerUtils"/>
+    <classEntry path="com.lorentz.SVG.utils.ICloneable"/>
     <classEntry path="com.lorentz.SVG.utils.MathUtils"/>
     <classEntry path="com.lorentz.SVG.utils.SVGColorUtils"/>
     <classEntry path="com.lorentz.SVG.utils.SVGUtil"/>
@@ -70,16 +92,40 @@
     <classEntry path="com.lorentz.processing.IProcess"/>
     <classEntry path="com.lorentz.processing.Process"/>
     <classEntry path="com.lorentz.processing.ProcessExecutor"/>
-    <classEntry path="com.lorentz.SVG.data.text.SVGDrawnText"/>
-    <classEntry path="com.lorentz.SVG.utils.FlashPlayerUtils"/>
-    <classEntry path="com.lorentz.SVG.data.filters.SVGFilterCollection"/>
-    <classEntry path="com.lorentz.SVG.data.filters.SVGGaussianBlur"/>
-    <classEntry path="com.lorentz.SVG.data.filters.ISVGFilter"/>
-    <classEntry path="com.lorentz.SVG.display.SVGMarker"/>
-    <classEntry path="com.lorentz.SVG.drawing.MarkersPlacesCapturerDrawer"/>
-    <classEntry path="com.lorentz.SVG.data.MarkerPlace"/>
-    <classEntry path="com.lorentz.SVG.data.MarkerType"/>
-    <classEntry path="com.lorentz.SVG.utils.ICloneable"/>
+    <classEntry path="org.assetloader.AssetLoader"/>
+    <classEntry path="org.assetloader.base.AbstractLoader"/>
+    <classEntry path="org.assetloader.base.AssetLoaderBase"/>
+    <classEntry path="org.assetloader.base.AssetLoaderError"/>
+    <classEntry path="org.assetloader.base.AssetType"/>
+    <classEntry path="org.assetloader.base.LoaderFactory"/>
+    <classEntry path="org.assetloader.base.LoaderStats"/>
+    <classEntry path="org.assetloader.base.Param"/>
+    <classEntry path="org.assetloader.base.StatsMonitor"/>
+    <classEntry path="org.assetloader.core.IAssetLoader"/>
+    <classEntry path="org.assetloader.core.IConfigParser"/>
+    <classEntry path="org.assetloader.core.ILoadStats"/>
+    <classEntry path="org.assetloader.core.ILoader"/>
+    <classEntry path="org.assetloader.core.IParam"/>
+    <classEntry path="org.assetloader.loaders.BaseLoader"/>
+    <classEntry path="org.assetloader.loaders.BinaryLoader"/>
+    <classEntry path="org.assetloader.loaders.CSSLoader"/>
+    <classEntry path="org.assetloader.loaders.DisplayObjectLoader"/>
+    <classEntry path="org.assetloader.loaders.ImageLoader"/>
+    <classEntry path="org.assetloader.loaders.JSONLoader"/>
+    <classEntry path="org.assetloader.loaders.SWFLoader"/>
+    <classEntry path="org.assetloader.loaders.SoundLoader"/>
+    <classEntry path="org.assetloader.loaders.TextLoader"/>
+    <classEntry path="org.assetloader.loaders.VideoLoader"/>
+    <classEntry path="org.assetloader.loaders.XMLLoader"/>
+    <classEntry path="org.assetloader.parsers.URLParser"/>
+    <classEntry path="org.assetloader.parsers.XmlConfigParser"/>
+    <classEntry path="org.assetloader.signals.ErrorSignal"/>
+    <classEntry path="org.assetloader.signals.HttpStatusSignal"/>
+    <classEntry path="org.assetloader.signals.LoaderSignal"/>
+    <classEntry path="org.assetloader.signals.NetStatusSignal"/>
+    <classEntry path="org.assetloader.signals.ProgressSignal"/>
+    <classEntry path="org.assetloader.utils.ALLogger"/>
+    <classEntry path="org.assetloader.utils.Inspector"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

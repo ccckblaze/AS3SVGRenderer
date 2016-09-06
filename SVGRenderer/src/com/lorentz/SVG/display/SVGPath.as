@@ -18,8 +18,12 @@
 		public function get svgPath():String {
 			return getAttribute("path") as String;
 		}
-		public function set svgPath(value:String):void {
-			setAttribute("path", value);
+		public function set svgPath(value:String):void {		
+			if(getAttribute("path") != value){
+				setAttribute("path", value);
+				_pathRenderer = null;
+				invalidateRender();
+			}
 		}
 		
 		public function get path():Vector.<SVGPathCommand> {
@@ -37,6 +41,7 @@
 			switch(attributeName){
 				case "path" :
 					_invalidPathFlag = true;
+					path = SVGParserCommon.parsePathData(svgPath); 
 					invalidateProperties();
 			}
 		}
@@ -51,7 +56,7 @@
 			}
 		}
 		
-		override protected function beforeDraw():void {
+		override protected function beforeDraw():void { 
 			super.beforeDraw();
 			_pathRenderer = new SVGPathRenderer(path); 
 		}

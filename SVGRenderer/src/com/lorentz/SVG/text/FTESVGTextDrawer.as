@@ -4,6 +4,7 @@ package com.lorentz.SVG.text
 	import com.lorentz.SVG.data.text.SVGTextToDraw;
 	import com.lorentz.SVG.utils.TextUtils;
 	
+	import flash.display.DisplayObject;
 	import flash.text.engine.ElementFormat;
 	import flash.text.engine.FontDescription;
 	import flash.text.engine.FontLookup;
@@ -18,7 +19,7 @@ package com.lorentz.SVG.text
 		public function start():void {
 		}
 		
-		public function drawText(data:SVGTextToDraw):SVGDrawnText {
+		public function drawText(data:SVGTextToDraw, textSprite:DisplayObject = null):SVGDrawnText {
 			var fontDescription:FontDescription = new FontDescription();
 			fontDescription.fontLookup = data.useEmbeddedFonts ? FontLookup.EMBEDDED_CFF : FontLookup.DEVICE;
 			fontDescription.fontName = data.fontFamily;

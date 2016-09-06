@@ -2,7 +2,8 @@
 	import com.lorentz.SVG.data.style.StyleDeclaration;
 	
 	import flash.geom.Matrix;
-		
+	import flash.text.Font;
+	
 	public class SVGUtil {
 		public static function processXMLEntities(xmlString:String):String {
 			while(true){
@@ -63,6 +64,18 @@
 			return s;
 		}
 		
+		static private var fontList:Array = null;
+		public static function validFontFamily(fontName:String):Boolean{
+			if(fontList == null){
+				fontList = Font.enumerateFonts(true);
+			}
+			for each(var font:Font in fontList){
+				if(font.fontName == fontName){
+					return true;
+				}
+			}
+			return false;
+		}
 		
 		protected static const presentationStyles:Array = [
 			"display",
@@ -90,7 +103,8 @@
 			"marker",
 			"marker-start",
 			"marker-mid",
-			"marker-end"
+			"marker-end",
+			"pointer-events"
 		];
 		
 		public static function presentationStyleToStyleDeclaration(elt:XML, styleDeclaration:StyleDeclaration = null):StyleDeclaration {
@@ -119,7 +133,7 @@
 			mat.translate( cx-r, cy-r ); 
 			
 			return mat; 
-        }
+		}
 		
 		public static function flashLinearGradientMatrix( x1:Number, y1:Number, x2:Number, y2:Number ):Matrix { 
 			var w:Number = x2-x1;
@@ -135,7 +149,7 @@
 			matr.translate( x1, y1 ); 
 			
 			return matr; 
-        }
+		}
 		
 		public static function extractUrlId(url:String):String {
 			var matches:Array = /url\s*\(#(.*?)\)/.exec(url);
@@ -184,12 +198,12 @@
 				value = Number(StringUtil.remove(s, "px"));
 				return value;
 				
-			//Relative
+				//Relative
 			} else if(s.indexOf("em")!=-1){
 				value = Number(StringUtil.remove(s, "em"));
 				return value*referenceFontSize;
 				
-			//Percentage
+				//Percentage
 			} else if(s.indexOf("%")!=-1){
 				value = Number(StringUtil.remove(s, "%"));
 				

@@ -5,6 +5,7 @@
 	import com.lorentz.SVG.events.SVGEvent;
 	import com.lorentz.SVG.parser.AsyncSVGParser;
 	import com.lorentz.SVG.text.FTESVGTextDrawer;
+	import com.lorentz.SVG.text.TextFieldSVGTextDrawer;
 	import com.lorentz.SVG.text.ISVGTextDrawer;
 	import com.lorentz.SVG.utils.ICloneable;
 	import com.lorentz.SVG.utils.SVGUtil;
@@ -77,12 +78,12 @@
 		/**
 		 * Default value for attribute fontStyle on SVGDocuments, and also is used an embedded font is missing, and missingFontAction on svgDocument is USE_DEFAULT.
 		 */		
-		public var defaultFontName:String = "Verdana";
+		public var defaultFontName:String = "SimSun";
 		
 		/**
 		 * Determines if the document should use embedded 
 		 */		
-		public var useEmbeddedFonts:Boolean = true;
+		public var useEmbeddedFonts:Boolean = false;
 		
 		/**
 		 * Function that is called before sending svgTextToDraw to TextDrawer, allowing you to change texts formats with your own rule.
@@ -95,7 +96,7 @@
 		/**
 		 * Object used to draw texts 
 		 */		
-		public var textDrawer:ISVGTextDrawer = new FTESVGTextDrawer();
+		public var textDrawer:ISVGTextDrawer = new TextFieldSVGTextDrawer();
 		
 		/*
 		* Set to autmaticly align the topLeft of the rendered svg content to the svgDocument origin. 
@@ -145,7 +146,7 @@
 			if(e.currentTarget != _urlLoader)
 				return;
 			
-			trace(e.text);
+			trace("urlLoader_ioErrorHandler " + e.text);
 			_urlLoader = null;
 		}
 		
@@ -210,9 +211,10 @@
 			if(_firstValidationAfterParse)
 			{
 				_firstValidationAfterParse = false;
-				if(hasEventListener(SVGEvent.RENDERED))
-					dispatchEvent( new SVGEvent( SVGEvent.RENDERED ) );
 			}
+			
+			if(hasEventListener(SVGEvent.RENDERED))
+				dispatchEvent( new SVGEvent( SVGEvent.RENDERED ) );
 		}
 		
 		public function clear():void {
@@ -226,8 +228,8 @@
 			
 			style.clear();
 			
-			for(var id:String in _definitions)
-				removeDefinition(id);
+			for(var define:String in _definitions)
+				removeDefinition(define);
 
 			while(numElements > 0)
 				removeElementAt(0);

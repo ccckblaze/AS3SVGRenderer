@@ -176,6 +176,9 @@ package com.lorentz.SVG.Flex
 			if(_sourceInvalid){
 				_sourceInvalid = false;
 				
+				if(!_source){
+					_svgDocument.clear();
+				}
 				if((_source is String && !isXML(String(_source))) || _source is URLRequest)
 				{
 					_svgDocument.load(_source);
@@ -202,15 +205,9 @@ package com.lorentz.SVG.Flex
 		}
 		
 		override protected function measure():void {
-			if(_svgDocument != null)
-			{				
-				var bounds:Rectangle = DisplayUtils.safeGetBounds(_svgDocument, this);
-				this.measuredWidth = bounds.left + bounds.width;
-				this.measuredHeight = bounds.top + bounds.height;
-			} else {
-				this.measuredWidth = 0;
-				this.measuredHeight = 0;
-			}
+			var bounds:Rectangle = DisplayUtils.safeGetBounds(_svgDocument, this);
+			this.measuredWidth = bounds.left + bounds.width;
+			this.measuredHeight = bounds.top + bounds.height;
 		}
 	}
 }

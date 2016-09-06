@@ -76,7 +76,7 @@
 			for(var i:int = 0; i < numTextElements; i++){
 				var textElement:Object = getTextElementAt(i);
 				
-				if(textElement is String){
+				if(textElement is String){3
 					var drawnText:SVGDrawnText = createTextSprite( textElement as String, document.textDrawer );
 										
 					if((drawnText.direction || direction) == "lr"){

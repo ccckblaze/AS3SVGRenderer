@@ -9,13 +9,15 @@ package com.lorentz.SVG.display.base
 	import com.lorentz.SVG.utils.TextUtils;
 	
 	import flash.display.DisplayObject;
+	import flash.filters.GlowFilter;
+	import flash.filters.BitmapFilterQuality;
 
 	public class SVGTextContainer extends SVGGraphicsElement
 	{
-		private var _svgX:String;
-		private var _svgY:String;
+		private var _svgX:String = "0";
+		private var _svgY:String = "0";
 		private var _textOwner:SVGText;
-		protected var _renderObjects:Vector.<DisplayObject>;
+		public var _renderObjects:Vector.<DisplayObject>;
 		
 		public function SVGTextContainer(tagName:String) {
 			super(tagName);
@@ -100,6 +102,8 @@ package com.lorentz.SVG.display.base
 			if(element is SVGElement)
 				detachElement(element as SVGElement);
 			
+			_textElements.splice(index, 1);
+			
 			invalidateRender();
 		}
 		
@@ -116,10 +120,40 @@ package com.lorentz.SVG.display.base
 			switch(styleName){
 				case "font-size" :
 				case "font-family" :
-				case "font-weight" :
+				case "font-weight" :			
 					invalidateRender();
 					break;
 			}
+		}
+		
+		public function getTextToDraw(text:String):SVGTextToDraw
+		{
+			var textToDraw:SVGTextToDraw = new SVGTextToDraw();
+			
+			textToDraw.text = text;
+			
+			textToDraw.useEmbeddedFonts = document.useEmbeddedFonts;
+			textToDraw.parentFontSize = parentElement ? parentElement.currentFontSize : currentFontSize;
+			textToDraw.fontSize = currentFontSize;
+			var myPattern:RegExp = /'/g;
+			textToDraw.fontFamily = String(SVGUtil.validFontFamily(finalStyle.getPropertyValue("font-family")) ? finalStyle.getPropertyValue("font-family").replace(myPattern, "") : document.defaultFontName);
+			textToDraw.fontWeight = finalStyle.getPropertyValue("font-weight") || "normal";
+			textToDraw.fontStyle = finalStyle.getPropertyValue("font-style") || "normal";
+			textToDraw.baselineShift = finalStyle.getPropertyValue("baseline-shift") || "baseline";
+			textToDraw.dominantBaseline = finalStyle.getPropertyValue("dominant-baseline") || "auto";
+			
+			var letterSpacing:String = finalStyle.getPropertyValue("letter-spacing") || "normal";
+			if(letterSpacing && letterSpacing.toLowerCase() != "normal")
+				textToDraw.letterSpacing = SVGUtil.getUserUnit(letterSpacing, currentFontSize, viewPortWidth, viewPortHeight, SVGUtil.FONT_SIZE);
+			
+			if(document.textDrawingInterceptor != null)
+				document.textDrawingInterceptor(textToDraw);
+			
+			//If need to draw in right color, pass color inside format
+			if(!hasComplexFill)
+				textToDraw.color = getFillColor();
+			
+			return textToDraw;
 		}
 		
 		protected function createTextSprite(text:String, textDrawer:ISVGTextDrawer):SVGDrawnText {
@@ -133,28 +167,7 @@ package com.lorentz.SVG.display.base
 				text = String.fromCharCode(0x200E) + text + String.fromCharCode(0x200E);
 
 			//Setup text format, to pass to the TextDrawer
-			var textToDraw:SVGTextToDraw = new SVGTextToDraw();
-			
-			textToDraw.text = text;
-			
-			textToDraw.useEmbeddedFonts = document.useEmbeddedFonts;
-			textToDraw.parentFontSize = parentElement ? parentElement.currentFontSize : currentFontSize;
-			textToDraw.fontSize = currentFontSize;
-			textToDraw.fontFamily = String(finalStyle.getPropertyValue("font-family") || document.defaultFontName);
-			textToDraw.fontWeight = finalStyle.getPropertyValue("font-weight") || "normal";
-			textToDraw.fontStyle = finalStyle.getPropertyValue("font-style") || "normal";
-			textToDraw.baselineShift = finalStyle.getPropertyValue("baseline-shift") || "baseline";
-			
-			var letterSpacing:String = finalStyle.getPropertyValue("letter-spacing") || "normal";
-			if(letterSpacing && letterSpacing.toLowerCase() != "normal")
-				textToDraw.letterSpacing = SVGUtil.getUserUnit(letterSpacing, currentFontSize, viewPortWidth, viewPortHeight, SVGUtil.FONT_SIZE);
-			
-			if(document.textDrawingInterceptor != null)
-				document.textDrawingInterceptor(textToDraw);
-			
-			//If need to draw in right color, pass color inside format
-			if(!hasComplexFill)
-				textToDraw.color = getFillColor();
+			var textToDraw:SVGTextToDraw = getTextToDraw(text);
 			
 			//Use configured textDrawer to draw text on a displayObject
 			var drawnText:SVGDrawnText = textDrawer.drawText(textToDraw);
@@ -167,10 +180,31 @@ package com.lorentz.SVG.display.base
 					drawnText.displayObject.alpha = 0;
 			}
 			
+			//Stroke
+			if(hasStroke){
+				var outline:GlowFilter=new GlowFilter(getStrokeColor(), 1.0, 2.0, 2.0, 4);
+				outline.quality = BitmapFilterQuality.LOW;
+				drawnText.displayObject.filters = [outline];
+			}
+			
 			//Adds direction to drawnTextInformation
 			drawnText.direction = direction;
 			
 			return drawnText;
+		}
+		
+		override protected function get hasStroke():Boolean {
+			var stroke:String = finalStyle.getPropertyValue("stroke");
+			return (stroke != null);
+		}
+		
+		private function getStrokeColor():uint {
+			var stroke:String = finalStyle.getPropertyValue("stroke");
+			
+			if(stroke == null)
+				return 0x000000;
+			else
+				return SVGColorUtils.parseToUint(stroke);
 		}
 		
 		protected function get hasComplexFill():Boolean {

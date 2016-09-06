@@ -109,8 +109,10 @@ package com.lorentz.SVG.data.style
 			for(var i:int = 0; i < target.length; i++)
 			{
 				propertyName = target.item(i);
-				if(!hasProperty(propertyName))
+				if(!hasProperty(propertyName)){
 					target.removeProperty(propertyName);
+					--i;
+				}
 			}
 		}
 		

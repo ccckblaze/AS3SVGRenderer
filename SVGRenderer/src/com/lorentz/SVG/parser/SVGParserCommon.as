@@ -75,13 +75,40 @@
 							commands.push(new SVGArcToCommand(type=="A", Number(args[a++]), Number(args[a++]), Number(args[a++]), args[a++]!="0", args[a++]!="0", Number(args[a++]), Number(args[a++])));
 							break;	
 						
-						default : trace("Invalid PathCommand type: " + type);
+						default : trace("parsePathData, Invalid PathCommand type: " + type);
 							a = args.length; //Break args loop
 					}
 				}
 			}
 			
 			return commands; 
+		}
+		
+		public static function parseDuration(input:String):Number{
+			var durValue:Number = 0;
+			var durTmp:String = input;
+			var pos:Number;
+			
+			pos = durTmp.indexOf("h");
+			if(pos != -1){				
+				durValue += parseFloat("0" + durTmp.substr(0, pos)) * 60 * 60 * 1000;
+				durTmp = durTmp.substr(pos + 1);
+			}
+			pos = durTmp.indexOf("min")
+			if(pos != -1){
+				durValue += parseFloat("0" + durTmp.substr(0, pos)) * 60 * 1000;
+				durTmp = durTmp.substr(pos + 3);
+			}
+			pos = durTmp.indexOf("s");
+			if(pos != -1 && durTmp.charAt(pos - 1) != "m"){
+				durValue += parseFloat("0" + durTmp.substr(0, pos)) * 1000;
+				durTmp = durTmp.substr(pos + 1);
+			}
+			pos = durTmp.indexOf("ms");
+			if(pos != -1){
+				durValue += parseFloat("0" + durTmp.substr(0, pos));
+			}
+			return durValue;
 		}
 		
 		public static function splitNumericArgs(input:String):Vector.<String> {

@@ -6,6 +6,7 @@
 	
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.geom.Rectangle;
 	
 	public class SVGText extends SVGTextContainer {				
@@ -54,7 +55,7 @@
 			for(var i:int = 0; i < numTextElements; i++){
 				var textElement:Object = getTextElementAt(i);
 				
-				if(textElement is String){
+				if(textElement && textElement is String){
 					var drawnText:SVGDrawnText = createTextSprite( textElement as String, document.textDrawer );
 										
 					if((drawnText.direction || direction) == "lr"){
@@ -106,6 +107,8 @@
 				
 				_renderObjects.push(fill);
 			}
+			
+			dispatchEvent(new Event(Event.CHANGE, true));
 		}
 		
 		override protected function getObjectBounds():Rectangle {

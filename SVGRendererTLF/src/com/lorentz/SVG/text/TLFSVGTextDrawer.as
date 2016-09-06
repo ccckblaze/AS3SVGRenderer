@@ -4,7 +4,7 @@ package com.lorentz.SVG.text
 	import com.lorentz.SVG.data.text.SVGTextToDraw;
 	import com.lorentz.SVG.utils.TextUtils;
 	
-	import flash.display.Sprite;
+	import flash.display.DisplayObject;
 	import flash.geom.Rectangle;
 	import flash.text.engine.FontLookup;
 	import flash.text.engine.FontPosture;
@@ -20,6 +20,7 @@ package com.lorentz.SVG.text
 	import flashx.textLayout.elements.SpanElement;
 	import flashx.textLayout.elements.TextFlow;
 	import flashx.textLayout.formats.TextAlign;
+	import flash.display.Sprite;
 	
 	public class TLFSVGTextDrawer implements ISVGTextDrawer
 	{
@@ -30,9 +31,9 @@ package com.lorentz.SVG.text
 			textFlow.textAlign = TextAlign.START;
 		}
 				
-		public function drawText(data:SVGTextToDraw):SVGDrawnText {			
+		public function drawText(data:SVGTextToDraw, textSprite:DisplayObject = null):SVGDrawnText {			
 			// Create a sprite to place the text
-			var textSprite:Sprite = new Sprite();
+			var textSprite1:Sprite = new Sprite();
 			
 			// Create a paragraph
 			var paragraphElement:ParagraphElement = new ParagraphElement();
@@ -51,7 +52,7 @@ package com.lorentz.SVG.text
 			paragraphElement.addChild(spanElementTarget);
 			
 			// Create a controller to place the text inside sprite
-			var containerController:ContainerController = new ContainerController(textSprite, Number.NaN, Number.NaN);
+			var containerController:ContainerController = new ContainerController(textSprite1, Number.NaN, Number.NaN);
 			containerController.verticalScrollPolicy = ScrollPolicy.OFF;
 			textFlow.flowComposer.addController(containerController);
 			
@@ -89,7 +90,7 @@ package com.lorentz.SVG.text
 					break;
 			}
 			
-			return new SVGDrawnText(textSprite, lastAtomBounds.right, 0, textLine.ascent, baseLineShift);
+			return new SVGDrawnText(textSprite1, lastAtomBounds.right, 0, textLine.ascent, baseLineShift);
 		}
 		
 		public function end():void {

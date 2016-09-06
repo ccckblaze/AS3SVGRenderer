@@ -1,19 +1,29 @@
 ﻿package com.lorentz.SVG.display {
+	import com.lorentz.SVG.data.AssetManager;
 	import com.lorentz.SVG.display.base.ISVGViewPort;
 	import com.lorentz.SVG.display.base.SVGElement;
-	import com.lorentz.SVG.utils.Base64AsyncDecoder;
+	import com.lorentz.SVG.utils.SVGUtil;
+	import com.worlize.gif.GIFPlayerLagacy;
+	import com.worlize.gif.events.AsyncDecodeErrorEvent;
+	import com.worlize.gif.events.GIFPlayerEvent;
 	
 	import flash.display.Bitmap;
 	import flash.display.Loader;
+	import flash.display.LoaderInfo;
+	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.geom.Rectangle;
-	import flash.net.URLRequest;
 	import flash.utils.ByteArray;
-
-	public class SVGImage extends SVGElement implements ISVGViewPort {	
+	
+	public class SVGImage extends SVGElement implements ISVGViewPort {
 		private var _svgHrefChanged:Boolean = false;
 		private var _svgHref:String;
+		private var _assetManager:AssetManager = AssetManager.getInstance();
+		
+		private var source:ByteArray;
+		private var _loader:Loader;
 		
 		public function get svgPreserveAspectRatio():String {
 			return getAttribute("preserveAspectRatio") as String;
@@ -68,68 +78,81 @@
 			}
 		}
 		
-		protected var _loader:Loader;
-		
-		protected var _base64AsyncDecoder:Base64AsyncDecoder;
-
 		public function SVGImage() {
 			super("image");
 		}
-				
+		
 		public function loadURL(url:String):void {
-			if(_loader != null){
-				content.removeChild(_loader);
-				_loader = null;
-			}
+			_assetManager.requestAsset(url, loadBytes);
 			
-			if(url!=null){
-				_loader = new Loader();
-				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete);
-				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
-				_loader.load(new URLRequest(url));
-				content.addChild(_loader);
-			}
+			//			if(url!=null){
+			//				_loader = new Loader();
+			//				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete);
+			//				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
+			//				_loader.load(new URLRequest(/*url*/"http://f1.img4399.com/yxh~diy/66159738/2015/08/11/23/2808_Q3KHkF.png" + (Math.random() * 10000)), new LoaderContext(true));
+			//				content.addChild(_loader);
+			//			}
+			//			else if(_loader != null){
+			//				content.removeChild(_loader);
+			//				_loader = null;
+			//			}
+		}
+		
+		public function loadEmpty():void {
+			var spaceHolder:Sprite = new Sprite;
+			spaceHolder.graphics.beginFill(0x000000, 0);
+			spaceHolder.graphics.drawRect(0, 0, getViewPortUserUnit(svgWidth, SVGUtil.WIDTH), getViewPortUserUnit(svgHeight, SVGUtil.HEIGHT));
+			spaceHolder.graphics.endFill();
+			content.addChild(spaceHolder);
 		}
 		
 		//Thanks to youzi530, for coding base64 embed image support
 		public function loadBase64(content:String):void
 		{
-			var base64String:String = content.replace(/^data:[a-z\/]*;base64,/, '');
-			
-			_base64AsyncDecoder = new Base64AsyncDecoder(base64String);
-			_base64AsyncDecoder.addEventListener(Base64AsyncDecoder.COMPLETE, base64AsyncDecoder_completeHandler);
-			_base64AsyncDecoder.addEventListener(Base64AsyncDecoder.ERROR, base64AsyncDecoder_errorHandler);
-			_base64AsyncDecoder.decode();
+			_assetManager.requestBase64Asset(content, loadBytes);
 		}
 		
-		private function base64AsyncDecoder_completeHandler(e:Event):void {
-			loadBytes(_base64AsyncDecoder.bytes);
-			_base64AsyncDecoder = null;
-		}
-		
-		private function base64AsyncDecoder_errorHandler(e:Event):void {
-			trace(_base64AsyncDecoder.errorMessage);
-			_base64AsyncDecoder = null;
-		}
-		
-		public function loadBytes(byteArray:ByteArray):void {
-			if(_loader!=null){
-				content.removeChild(_loader);
-				_loader = null;
-			}
-			
-			if(byteArray!=null){
-				_loader = new Loader();
-				_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete);
-				_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
-				_loader.loadBytes(byteArray);
-				content.addChild(_loader);
+		public function loadBytes(byteArray:ByteArray, valid:Boolean = false):void {
+			if(source != byteArray){
+				if(byteArray != null){
+					_loader = new Loader();
+					if(valid){
+						beginASyncValidation("loadImage");
+					}
+					var gifPlayer:GIFPlayerLagacy = new GIFPlayerLagacy;
+					var onError:Function = function(e:Event):void{
+						_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete);
+						_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
+						_loader.loadBytes(byteArray);
+						(e.currentTarget as EventDispatcher).removeEventListener(e.type, onError);
+					};
+					var onComplete:Function = function(e:Event):void{
+						content.removeChildren();
+						content.graphics.beginFill(0x000000, 0);
+						content.graphics.drawRect(0,0,gifPlayer.width,gifPlayer.height);
+						content.graphics.endFill();
+						content.addChild(gifPlayer);
+						if(valid){
+							endASyncValidation("loadImage");
+						}
+						(e.currentTarget as EventDispatcher).removeEventListener(e.type, onComplete);
+					};
+					gifPlayer.addEventListener(AsyncDecodeErrorEvent.ASYNC_DECODE_ERROR, onError);
+					gifPlayer.addEventListener(GIFPlayerEvent.COMPLETE, onComplete);
+					gifPlayer.source = byteArray;
+				}
+				else if(_loader != null){
+					content.removeChildren();
+					_loader = null;
+				}
+				
+				source = byteArray;
 			}
 		}
 		
 		override protected function commitProperties():void {
 			super.commitProperties();
-
+			
 			if(_svgHrefChanged)
 			{
 				_svgHrefChanged = false;
@@ -137,33 +160,47 @@
 				if(svgHref != null && svgHref != ""){
 					if(svgHref.match(/^data:[a-z\/]*;base64,/)){
 						loadBase64(svgHref);
+						
 						beginASyncValidation("loadImage");
 					} else {
 						loadURL(document.resolveURL(svgHref));
+						
 						beginASyncValidation("loadImage");
 					}
+				}
+				else{
+					loadEmpty();
 				}
 			}
 		}
 		
-		private function loadComplete(event:Event):void {
-			if(_loader.content is Bitmap)
-				(_loader.content as Bitmap).smoothing = true;
-				
-			endASyncValidation("loadImage");
+		private function loadComplete(e:Event):void {
+			var cLoaderInfo:LoaderInfo = e.currentTarget as LoaderInfo;
+			if(cLoaderInfo){
+				if(cLoaderInfo.loader == _loader){
+					content.removeChildren();
+					content.addChild(cLoaderInfo.loader);
+					
+					var bitmap:Bitmap = cLoaderInfo.loader.content as Bitmap;
+					if(bitmap){
+						bitmap.smoothing = true;
+					}
+					endASyncValidation("loadImage");
+				}
+			}
+			(e.currentTarget as EventDispatcher).removeEventListener(e.type, loadComplete);
 		}
 		
 		private function loadError(e:IOErrorEvent):void {
-			trace("Failed to load image" + e.text);
+			trace("loadError, Failed to load image" + e.text);
 			
 			endASyncValidation("loadImage");
+			
+			(e.currentTarget as EventDispatcher).removeEventListener(e.type, loadComplete);
 		}
 		
 		override protected function getContentBox():Rectangle {
-			if(_loader == null || _loader.content == null)
-				return null;
-			
-			return new Rectangle(0, 0, _loader.content.width, _loader.content.height);
+			return new Rectangle(0, 0, content.width, content.height);
 		}
 		
 		override public function clone():Object {

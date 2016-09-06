@@ -2,7 +2,6 @@
 	import com.lorentz.SVG.display.base.SVGShape;
 	import com.lorentz.SVG.drawing.IDrawer;
 	import com.lorentz.SVG.utils.SVGUtil;
-	import com.lorentz.SVG.display.base.SVGElement;
 	
 	public class SVGRect extends SVGShape {
 		private var _xUnits:Number;
@@ -16,7 +15,7 @@
 			super("rect");
 		}
 		
-		private var _svgX:String;
+		private var _svgX:String = "0";
 		public function get svgX():String {
 			return _svgX;
 		}
@@ -27,7 +26,7 @@
 			}
 		}
 		
-		private var _svgY:String;
+		private var _svgY:String = "0";
 		public function get svgY():String {
 			return _svgY;
 		}
@@ -38,7 +37,7 @@
 			}
 		}
 		
-		private var _svgWidth:String;
+		private var _svgWidth:String = "0";
 		public function get svgWidth():String {
 			return _svgWidth;
 		}
@@ -49,7 +48,7 @@
 			}
 		}
 
-		private var _svgHeight:String;
+		private var _svgHeight:String = "0";
 		public function get svgHeight():String {
 			return _svgHeight;
 		}
