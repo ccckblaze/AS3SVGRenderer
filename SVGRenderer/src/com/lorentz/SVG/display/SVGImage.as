@@ -112,7 +112,7 @@
 			_assetManager.requestBase64Asset(content, loadBytes);
 		}
 		
-		public function loadBytes(byteArray:ByteArray, valid:Boolean = false):void {
+		public function loadBytes(byteArray:ByteArray, valid:Boolean = true):void {
 			if(source != byteArray){
 				if(byteArray != null){
 					_loader = new Loader();
@@ -120,25 +120,34 @@
 						beginASyncValidation("loadImage");
 					}
 					var gifPlayer:GIFPlayerLagacy = new GIFPlayerLagacy;
-					var onError:Function = function(e:Event):void{
-						_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete);
-						_loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
-						_loader.loadBytes(byteArray);
-						(e.currentTarget as EventDispatcher).removeEventListener(e.type, onError);
+					var makeOnError:Function = function(pLoader:Loader):Function{
+						var func:Function = function(e:Event):void{
+							pLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, loadComplete);
+							pLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, loadError);
+							pLoader.loadBytes(byteArray);
+							(e.currentTarget as EventDispatcher).removeEventListener(e.type, func);
+						};
+						return func;
 					};
-					var onComplete:Function = function(e:Event):void{
-						content.removeChildren();
-						content.graphics.beginFill(0x000000, 0);
-						content.graphics.drawRect(0,0,gifPlayer.width,gifPlayer.height);
-						content.graphics.endFill();
-						content.addChild(gifPlayer);
-						if(valid){
-							endASyncValidation("loadImage");
-						}
-						(e.currentTarget as EventDispatcher).removeEventListener(e.type, onComplete);
+					var makeOnComplete:Function = function(pContent:Sprite, pValid:Boolean):Function{ 
+						var func:Function = function(e:Event):void{
+							var player:GIFPlayerLagacy = e.currentTarget as GIFPlayerLagacy;
+							if(player){
+								pContent.removeChildren();
+								pContent.graphics.beginFill(0x000000, 0);
+								pContent.graphics.drawRect(0, 0, player.width, player.height);
+								pContent.graphics.endFill();
+								pContent.addChild(player);
+								if(pValid){
+									endASyncValidation("loadImage");
+								}
+							}
+							(e.currentTarget as EventDispatcher).removeEventListener(e.type, func);
+						};
+						return func;
 					};
-					gifPlayer.addEventListener(AsyncDecodeErrorEvent.ASYNC_DECODE_ERROR, onError);
-					gifPlayer.addEventListener(GIFPlayerEvent.COMPLETE, onComplete);
+					gifPlayer.addEventListener(AsyncDecodeErrorEvent.ASYNC_DECODE_ERROR, makeOnError(_loader));
+					gifPlayer.addEventListener(GIFPlayerEvent.COMPLETE, makeOnComplete(content, valid));
 					gifPlayer.source = byteArray;
 				}
 				else if(_loader != null){
