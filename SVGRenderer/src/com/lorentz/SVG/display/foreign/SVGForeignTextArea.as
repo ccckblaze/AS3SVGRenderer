@@ -66,7 +66,7 @@
 			for(var i:int = 0; i < numTextElements; i++){
 				var textElement:Object = getTextElementAt(i);
 				
-				if(textElement && textElement is String){		
+				if(textElement is String){		
 					if(!drawnText){
 						drawnText = createTextSprite(textElement as String);
 						
