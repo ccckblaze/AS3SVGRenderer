@@ -36,6 +36,7 @@ package com.lorentz.SVG.text
 			textFormat.italic = data.fontStyle == "italic";
 			textFormat.color = data.color;
 			textFormat.letterSpacing = data.letterSpacing;
+			textField.defaultTextFormat = textFormat;
 			textField.setTextFormat(textFormat);
 			textField.mouseEnabled = false;
 			
