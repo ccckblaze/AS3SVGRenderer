@@ -804,14 +804,16 @@
 					
 					var viewPortContentMetrics:Object = SVGViewPortUtils.getContentMetrics(viewPortRect, viewBoxRect, preserveAspectRatio.align, preserveAspectRatio.meetOrSlice);
 					
-					if(preserveAspectRatio.meetOrSlice == "slice")
+					if(preserveAspectRatio.meetOrSlice == "slice"){
 						this.scrollRect = viewPortRect;
+					}
 					
 					content.x = viewPortContentMetrics.contentX;
 					content.y = viewPortContentMetrics.contentY;
 					content.scaleX = viewPortContentMetrics.contentScaleX;
 					content.scaleY = viewPortContentMetrics.contentScaleY;
-				} else {
+				} 
+				else {
 					content.x = viewPortRect.x;
 					content.y = viewPortRect.y;
 					content.scaleX = viewPortRect.width / content.width;
