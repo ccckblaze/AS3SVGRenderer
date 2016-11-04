@@ -29,6 +29,7 @@
 	
 	public class SVGElement extends Sprite implements ICloneable {
 		public var content:Sprite;
+		public var userData:Object = new Object;
 
 		private var _mask:DisplayObject;
 		private static const _maskRgbToLuminanceFilter:ColorMatrixFilter = new ColorMatrixFilter([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2125, 0.7154, 0.0721, 0, 0,]);
