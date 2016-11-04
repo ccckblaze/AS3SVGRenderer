@@ -536,7 +536,7 @@ package com.lorentz.SVG.parser
 			var obj:SVGForeignAudio = new SVGForeignAudio();
 			
 			obj.src = ("@src" in elt) ? elt.@src : "";
-			obj.volume = ("@data-volume" in elt) ? elt.@volume : "0";
+			obj.volume = ("@data-volume" in elt) ? elt['@data-volume'] : "0";
 			
 			return obj;
 		}

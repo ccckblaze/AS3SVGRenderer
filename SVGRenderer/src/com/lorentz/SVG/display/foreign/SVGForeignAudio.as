@@ -4,7 +4,7 @@ package com.lorentz.SVG.display.foreign {
 	
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
-	import flash.net.URLRequest;
+	import flash.media.SoundTransform;
 	import flash.utils.ByteArray;
 	
 	public class SVGForeignAudio extends SVGElement {	
@@ -44,6 +44,7 @@ package com.lorentz.SVG.display.foreign {
 					var audio:Sound = new Sound;
 					audio.loadCompressedDataFromByteArray(data, data.length);
 					_audioChannel = audio.play();
+					_audioChannel.soundTransform = new SoundTransform(Number(volume));
 				});
 			}
 		}
