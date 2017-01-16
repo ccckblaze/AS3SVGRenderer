@@ -88,7 +88,7 @@ package com.lorentz.SVG.data
 				try{
 					if(!this.hasLoader(url) && !this.hasLoader(url)){
 						var name:String = url;
-						if(url.indexOf("http") == -1 && url.charAt(0) == "/")
+						if(url.indexOf("http") == -1 && url.charAt(0) == "/" && !url.indexOf("//") == 0)
 						{
 							url = ("http://www.3387.com") + url;
 						}
