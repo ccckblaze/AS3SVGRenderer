@@ -7,6 +7,8 @@ package com.lorentz.SVG.data
 	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	
+	import mx.core.FlexGlobals;
+	
 	import org.assetloader.AssetLoader;
 	import org.assetloader.base.AssetType;
 	import org.assetloader.base.Param;
@@ -82,6 +84,18 @@ package com.lorentz.SVG.data
 			}
 		}
 		
+		private function getFullDomain(fixDev:Boolean = false):String{
+			var domain:String = FlexGlobals.topLevelApplication.url;
+			var pathArray:Array = domain.split("//");
+			pathArray = pathArray[1].split("/");
+			domain = domain.substr(0, domain.indexOf("://")) + "://" + String(pathArray[0]);
+			if(fixDev){
+				var myPattern:RegExp = /dev./;
+				domain = domain.replace(myPattern, "www.");
+			}
+			return domain;
+		}
+		
 		// Add assets to queue.
 		public function loadAsset(url:String, type:String = AssetType.BINARY, priority:Number = -1, doWithAsset:Function = null):Boolean{
 			if(url){
@@ -90,7 +104,7 @@ package com.lorentz.SVG.data
 						var name:String = url;
 						if(url.indexOf("http") == -1 && url.charAt(0) == "/" && !url.indexOf("//") == 0)
 						{
-							url = ("http://www.3387.com") + url;
+							url = getFullDomain() + url;
 						}
 						this.addLazy(name, url, type, [new Param(Param.PRIORITY, priority)]);
 						if(doWithAsset != null){
